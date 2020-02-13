@@ -12,6 +12,7 @@ async function run(): Promise<void> {
     core.debug(`Version: ${stringify(version, true)}`)
 
     core.setOutput('full', stringify(version, true))
+    core.setOutput('fullNoMeta', stringify(version, false))
     core.setOutput('major', major)
     core.setOutput('minor', minor)
     core.setOutput('patch', patch)

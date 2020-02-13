@@ -4,6 +4,8 @@ author: 'FacilityNet'
 outputs:
   full:
     description: 'The full version'
+  fullNoMeta:
+    description: 'The full version but without build metadata'
   major:
     description: 'The major version'
   minor:
