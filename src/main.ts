@@ -1,16 +1,24 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import git from './git'
+import { getVersionFromGit, stringify } from './version'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+//    const { stdout: commitsSinceLastVersionTag } = await invoke('echo $(git describe --match "v*" | cut -d "-" -s -f 2)', [])
+//    const { stdout: versionTag } = await invoke('echo $(git describe --abbrev=0 --tags --match "v*" | cut -c 2-)', [])
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const version = await getVersionFromGit(git)
+    const { major, minor, patch, preRelease, buildMetadata } = version
+    core.debug(`Version: ${stringify(version, true)}`)
 
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('full', stringify(version, true))
+    core.setOutput('major', major)
+    core.setOutput('minor', minor)
+    core.setOutput('patch', patch)
+
+    if (preRelease) core.setOutput('preRelease', preRelease)
+    if (buildMetadata) core.setOutput('buildMetadata', buildMetadata)
+
   } catch (error) {
     core.setFailed(error.message)
   }
