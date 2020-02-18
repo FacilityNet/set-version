@@ -981,7 +981,7 @@ function run() {
         try {
             //    const { stdout: commitsSinceLastVersionTag } = await invoke('echo $(git describe --match "v*" | cut -d "-" -s -f 2)', [])
             //    const { stdout: versionTag } = await invoke('echo $(git describe --abbrev=0 --tags --match "v*" | cut -c 2-)', [])
-            const version = yield version_1.getVersionFromGit(git_1.default);
+            const version = yield version_1.getVersionFromGit(git_1.default, core.debug);
             const { major, minor, patch, preRelease, buildMetadata } = version;
             core.debug(`Version: ${version_1.stringify(version, true)}`);
             core.setOutput('full', version_1.stringify(version, true));
@@ -1098,28 +1098,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const exec = __importStar(__webpack_require__(986));
-function invoke(cmd, params) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const output = { stdout: '', stderr: '' };
-        const opts = {
-            listeners: {
-                stdout: (data) => (output.stdout += data.toString()),
-                stderr: (data) => (output.stderr += data.toString())
-            }
-        };
-        yield exec.exec(cmd, params, opts);
-        return output;
-    });
-}
+const lib_1 = __webpack_require__(646);
 class GitError extends Error {
     constructor(message) {
         super(message);
@@ -1129,9 +1109,17 @@ class GitError extends Error {
 }
 exports.GitError = GitError;
 const impl = {
-    describe(glob) {
+    fetchTags(logger = lib_1.nullLogger) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { stdout, stderr } = yield invoke('git', ['describe', '--match', glob]);
+            const { stdout, stderr } = yield lib_1.invoke('git', ['fetch', '--tags'], logger);
+            if (stderr.startsWith('fatal'))
+                throw new GitError(stderr);
+            return stdout;
+        });
+    },
+    describe(glob, logger = lib_1.nullLogger) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { stdout, stderr } = yield lib_1.invoke('git', ['describe', '--match', glob], logger);
             if (stderr.startsWith('fatal'))
                 throw new GitError(stderr);
             return stdout;
@@ -1359,6 +1347,53 @@ module.exports = require("path");
 
 /***/ }),
 
+/***/ 646:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const exec = __importStar(__webpack_require__(986));
+exports.nullLogger = message => { };
+function invoke(cmd, params, logger = exports.nullLogger) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const output = { stdout: '', stderr: '' };
+        const logAndAppend = (target) => (data) => {
+            const msg = data.toString();
+            logger(`git: ${msg}`);
+            target += msg;
+        };
+        const opts = {
+            listeners: {
+                stdout: logAndAppend(output.stdout),
+                stderr: logAndAppend(output.stderr)
+            }
+        };
+        yield exec.exec(cmd, params, opts);
+        return output;
+    });
+}
+exports.invoke = invoke;
+
+
+/***/ }),
+
 /***/ 669:
 /***/ (function(module) {
 
@@ -1576,7 +1611,7 @@ module.exports = require("fs");
 /***/ }),
 
 /***/ 775:
-/***/ (function(__unusedmodule, exports) {
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
 
 "use strict";
 
@@ -1590,11 +1625,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const lib_1 = __webpack_require__(646);
 const dashRegex = /-/;
 const dotRegex = /\./;
-function getVersionFromGit(git) {
+function getVersionFromGit(git, logger = lib_1.nullLogger) {
     return __awaiter(this, void 0, void 0, function* () {
-        const described = yield git.describe('v*');
+        // Ensure we have tags available
+        yield git.fetchTags(logger);
+        // Find nearest tag
+        const described = yield git.describe('v*', logger);
+        // Parse tag output
         const [majorMinor, commitsSinceTag, sha1] = described.split(dashRegex);
         const [major, minor] = majorMinor.substring(1).split(dotRegex);
         return {
