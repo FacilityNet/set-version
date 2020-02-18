@@ -15,12 +15,20 @@ export class GitError extends Error {
 
 const impl: Git = {
     async fetchTags(logger: Logger = nullLogger) {
-        const { stdout, stderr } = await invoke('git', ['fetch', '--tags'], logger)
+        const { stdout, stderr } = await invoke(
+            'git',
+            ['fetch', '--tags'],
+            logger
+        )
         if (stderr.startsWith('fatal')) throw new GitError(stderr)
         return stdout
     },
     async describe(glob: string, logger: Logger = nullLogger) {
-        const {stdout, stderr} = await invoke('git', ['describe', '--match', glob], logger)
+        const { stdout, stderr } = await invoke(
+            'git',
+            ['describe', '--match', glob],
+            logger
+        )
         if (stderr.startsWith('fatal')) throw new GitError(stderr)
         return stdout
     }

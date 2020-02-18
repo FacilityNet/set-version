@@ -12,7 +12,10 @@ interface SemanticVersion {
     buildMetadata?: string
 }
 
-export async function getVersionFromGit(git: Git, logger: Logger = nullLogger): Promise<SemanticVersion> {
+export async function getVersionFromGit(
+    git: Git,
+    logger: Logger = nullLogger
+): Promise<SemanticVersion> {
     // Ensure we have tags available
     await git.fetchTags(logger)
 
@@ -32,7 +35,10 @@ export async function getVersionFromGit(git: Git, logger: Logger = nullLogger): 
     }
 }
 
-export function stringify(v: SemanticVersion, includeMetadata: boolean): string {
+export function stringify(
+    v: SemanticVersion,
+    includeMetadata: boolean
+): string {
     let res = `${v.major}.${v.minor}.${v.patch}`
     if (v.preRelease != null) res += `-${v.preRelease}`
     if (includeMetadata && v.buildMetadata != null) res += `+${v.buildMetadata}`
