@@ -13,7 +13,7 @@ export const nullLogger: Logger = {
     debug: devNull,
     info: devNull,
     warning: devNull,
-    error: devNull,
+    error: devNull
 }
 
 export interface ProcessOutput {

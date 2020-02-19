@@ -12,7 +12,7 @@ async function run(): Promise<void> {
             debug: core.debug,
             info: core.info,
             warning: core.warning,
-            error: core.error,
+            error: core.error
         }
 
         const version = await getVersionFromGit(git, logger)
