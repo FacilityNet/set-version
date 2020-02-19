@@ -1119,7 +1119,7 @@ const impl = {
     },
     describe(glob, logger = lib_1.nullLogger) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { stdout, stderr } = yield lib_1.invoke('git', ['describe', '--match', glob], logger);
+            const { stdout, stderr } = yield lib_1.invoke('git', ['describe', '--match', `"${glob}"`], logger);
             if (stderr.startsWith('fatal'))
                 throw new GitError(stderr);
             return stdout;
