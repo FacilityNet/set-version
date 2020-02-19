@@ -1,8 +1,20 @@
 import * as exec from '@actions/exec'
 
-export type Logger = (message: string) => void
+export interface Logger {
+    debug: (message: string) => void
+    info: (message: string) => void
+    warning: (message: string) => void
+    error: (message: string) => void
+}
 
-export const nullLogger: Logger = message => {}
+const devNull = (m: string) => {}
+
+export const nullLogger: Logger = {
+    debug: devNull,
+    info: devNull,
+    warning: devNull,
+    error: devNull
+}
 
 export interface ProcessOutput {
     stdout: string
@@ -15,15 +27,18 @@ export async function invoke(
     logger: Logger = nullLogger
 ): Promise<ProcessOutput> {
     const output: ProcessOutput = { stdout: '', stderr: '' }
-    const logAndAppend = (target: string) => (data: Buffer) => {
-        const msg = data.toString()
-        logger(`git: ${msg}`)
-        target += msg
-    }
     const opts = {
         listeners: {
-            stdout: logAndAppend(output.stdout),
-            stderr: logAndAppend(output.stderr)
+            stdout: (data: Buffer) => {
+                const msg = data.toString()
+                logger.debug(`git: ${msg}`)
+                output.stdout += msg
+            },
+            stderr: (data: Buffer) => {
+                const msg = data.toString()
+                logger.warning(`git: ${msg}`)
+                output.stderr += msg
+            }
         }
     }
 
