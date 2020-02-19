@@ -981,9 +981,18 @@ function run() {
         try {
             //    const { stdout: commitsSinceLastVersionTag } = await invoke('echo $(git describe --match "v*" | cut -d "-" -s -f 2)', [])
             //    const { stdout: versionTag } = await invoke('echo $(git describe --abbrev=0 --tags --match "v*" | cut -c 2-)', [])
-            const version = yield version_1.getVersionFromGit(git_1.default, core.debug);
+            const logger = {
+                debug: core.debug,
+                info: core.info,
+                warning: core.warning,
+                error: core.error
+            };
+            const version = yield version_1.getVersionFromGit(git_1.default, logger);
             const { major, minor, patch, preRelease, buildMetadata } = version;
-            core.debug(`Version: ${version_1.stringify(version, true)}`);
+            core.info(`Calculated version: ${version_1.stringify(version, true)}`);
+            core.info(`major: ${major}`);
+            core.info(`minor: ${minor}`);
+            core.info(`patch: ${patch}`);
             core.setOutput('full', version_1.stringify(version, true));
             core.setOutput('fullNoMeta', version_1.stringify(version, false));
             core.setOutput('major', major);
@@ -1119,7 +1128,7 @@ const impl = {
     },
     describe(glob, logger = lib_1.nullLogger) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { stdout, stderr } = yield lib_1.invoke('git', ['describe', '--match', `"${glob}"`], logger);
+            const { stdout, stderr } = yield lib_1.invoke('git', ['describe', '--match', glob], logger);
             if (stderr.startsWith('fatal'))
                 throw new GitError(stderr);
             return stdout;
@@ -1370,19 +1379,28 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const exec = __importStar(__webpack_require__(986));
-exports.nullLogger = message => { };
+const devNull = (m) => { };
+exports.nullLogger = {
+    debug: devNull,
+    info: devNull,
+    warning: devNull,
+    error: devNull
+};
 function invoke(cmd, params, logger = exports.nullLogger) {
     return __awaiter(this, void 0, void 0, function* () {
         const output = { stdout: '', stderr: '' };
-        const logAndAppend = (target) => (data) => {
-            const msg = data.toString();
-            logger(`git: ${msg}`);
-            target += msg;
-        };
         const opts = {
             listeners: {
-                stdout: logAndAppend(output.stdout),
-                stderr: logAndAppend(output.stderr)
+                stdout: (data) => {
+                    const msg = data.toString();
+                    logger.debug(`git: ${msg}`);
+                    output.stdout += msg;
+                },
+                stderr: (data) => {
+                    const msg = data.toString();
+                    logger.warning(`git: ${msg}`);
+                    output.stderr += msg;
+                }
             }
         };
         yield exec.exec(cmd, params, opts);
