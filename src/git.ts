@@ -26,7 +26,7 @@ const impl: Git = {
     async describe(glob: string, logger: Logger = nullLogger) {
         const { stdout, stderr } = await invoke(
             'git',
-            ['describe', '--match', `"${glob}"`],
+            ['describe', '--match', glob],
             logger
         )
         if (stderr.startsWith('fatal')) throw new GitError(stderr)
