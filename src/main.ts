@@ -12,6 +12,10 @@ async function run(): Promise<void> {
         const eventName = core.getInput('eventName', { required: true })
         const eventAsJson = core.getInput('event', { required: false })
 
+        core.info(`Running for event: ${eventName}`)
+        if (eventAsJson) core.info(eventAsJson)
+        else core.info('No event data')
+
         const logger: Logger = {
             debug: core.debug,
             info: core.info,

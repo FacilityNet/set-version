@@ -79,5 +79,5 @@ export interface PullRequest {
 export interface PullRequestEvent {
     action: PullRequestAction
     number: number
-    pull_request: PullRequest
+    pull_request?: PullRequest
 }
