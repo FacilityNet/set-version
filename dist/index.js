@@ -981,18 +981,28 @@ function run() {
         try {
             //    const { stdout: commitsSinceLastVersionTag } = await invoke('echo $(git describe --match "v*" | cut -d "-" -s -f 2)', [])
             //    const { stdout: versionTag } = await invoke('echo $(git describe --abbrev=0 --tags --match "v*" | cut -c 2-)', [])
+            const eventName = core.getInput('eventName', { required: true });
+            const eventAsJson = core.getInput('event', { required: false });
             const logger = {
                 debug: core.debug,
                 info: core.info,
                 warning: core.warning,
                 error: core.error
             };
-            const version = yield version_1.getVersionFromGit(git_1.default, logger);
+            let version = yield version_1.getVersionFromGit(git_1.default, logger);
+            if (eventName === 'pull_request' && eventAsJson != null) {
+                const event = JSON.parse(eventAsJson);
+                version = version_1.withPullRequestInfo(version, event);
+            }
             const { major, minor, patch, preRelease, buildMetadata } = version;
             core.info(`Calculated version: ${version_1.stringify(version, true)}`);
             core.info(`major: ${major}`);
             core.info(`minor: ${minor}`);
             core.info(`patch: ${patch}`);
+            if (preRelease)
+                core.info(`pre-release: ${preRelease}`);
+            if (buildMetadata)
+                core.info(`build metadata: ${buildMetadata}`);
             core.setOutput('full', version_1.stringify(version, true));
             core.setOutput('fullNoMeta', version_1.stringify(version, false));
             core.setOutput('major', major);
@@ -1665,6 +1675,12 @@ function getVersionFromGit(git, logger = lib_1.nullLogger) {
     });
 }
 exports.getVersionFromGit = getVersionFromGit;
+function withPullRequestInfo(version, event) {
+    if (event == null)
+        return version;
+    return Object.assign(Object.assign({}, version), { preRelease: `pr${event.number}` });
+}
+exports.withPullRequestInfo = withPullRequestInfo;
 function stringify(v, includeMetadata) {
     let res = `${v.major}.${v.minor}.${v.patch}`;
     if (v.preRelease != null)
