@@ -983,6 +983,11 @@ function run() {
             //    const { stdout: versionTag } = await invoke('echo $(git describe --abbrev=0 --tags --match "v*" | cut -c 2-)', [])
             const eventName = core.getInput('eventName', { required: true });
             const eventAsJson = core.getInput('event', { required: false });
+            core.info(`Running for event: ${eventName}`);
+            if (eventAsJson)
+                core.info(eventAsJson);
+            else
+                core.info('No event data');
             const logger = {
                 debug: core.debug,
                 info: core.info,
