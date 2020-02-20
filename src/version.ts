@@ -1,5 +1,6 @@
 import { Logger, nullLogger } from './lib'
 import { Git } from './git'
+import { PullRequestEvent } from './github'
 
 const dashRegex = /-/
 const dotRegex = /\./
@@ -32,6 +33,18 @@ export async function getVersionFromGit(
         patch: commitsSinceTag ?? '',
         preRelease: '',
         buildMetadata: sha1 ?? ''
+    }
+}
+
+export function withPullRequestInfo(
+    version: SemanticVersion,
+    event?: PullRequestEvent
+): SemanticVersion {
+    if (event == null) return version
+
+    return {
+        ...version,
+        preRelease: `pr${event.number}`
     }
 }
 
