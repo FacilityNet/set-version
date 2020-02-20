@@ -5,7 +5,7 @@ import { PullRequestEvent } from './github'
 const dashRegex = /-/
 const dotRegex = /\./
 
-interface SemanticVersion {
+export interface SemanticVersion {
     major: string
     minor: string
     patch: string
