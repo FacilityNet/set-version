@@ -104,6 +104,16 @@ describe('stringify', () => {
 
         expect(stringify(version, false)).toEqual('2.1.5')
     })
+    test('does not append metadata for empty string', () => {
+        const version: SemanticVersion = {
+            major: '2',
+            minor: '1',
+            patch: '5',
+            buildMetadata: ''
+        }
+
+        expect(stringify(version, true)).toEqual('2.1.5')
+    })
     test('appends metadata correctly', () => {
         const version: SemanticVersion = {
             major: '2',
@@ -113,6 +123,16 @@ describe('stringify', () => {
         }
 
         expect(stringify(version, true)).toEqual('2.1.5+sjkdhksdjka')
+    })
+    test('does not append pre-release for empty string', () => {
+        const version: SemanticVersion = {
+            major: '2',
+            minor: '1',
+            patch: '5',
+            preRelease: ''
+        }
+
+        expect(stringify(version, true)).toEqual('2.1.5')
     })
     test('appends prerelease correctly', () => {
         const version: SemanticVersion = {

@@ -53,7 +53,7 @@ export function stringify(
     includeMetadata: boolean
 ): string {
     let res = `${v.major}.${v.minor}.${v.patch}`
-    if (v.preRelease != null) res += `-${v.preRelease}`
-    if (includeMetadata && v.buildMetadata != null) res += `+${v.buildMetadata}`
+    if (v.preRelease) res += `-${v.preRelease}`
+    if (includeMetadata && v.buildMetadata) res += `+${v.buildMetadata}`
     return res
 }
