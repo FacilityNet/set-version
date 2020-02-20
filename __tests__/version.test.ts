@@ -30,7 +30,7 @@ describe('getVersionFromGit', () => {
         await expect(getVersionFromGit(git)).resolves.toEqual({
             major: '2',
             minor: '5',
-            patch: '',
+            patch: '0',
             preRelease: '',
             buildMetadata: ''
         })
@@ -46,6 +46,21 @@ describe('getVersionFromGit', () => {
             major: '2',
             minor: '0',
             patch: '13',
+            preRelease: '',
+            buildMetadata: 'gdb82e9be'
+        })
+    })
+
+    test('handles tag without minor version', async () => {
+        const git: Git = {
+            fetchTags: logger => Promise.resolve(''),
+            describe: (glob, logger) => Promise.resolve('v51-26-gdb82e9be')
+        }
+
+        await expect(getVersionFromGit(git)).resolves.toEqual({
+            major: '51',
+            minor: '0',
+            patch: '26',
             preRelease: '',
             buildMetadata: 'gdb82e9be'
         })

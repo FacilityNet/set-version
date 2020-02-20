@@ -29,8 +29,8 @@ export async function getVersionFromGit(
 
     return {
         major,
-        minor,
-        patch: commitsSinceTag ?? '',
+        minor: minor ?? '0',
+        patch: commitsSinceTag ?? '0',
         preRelease: '',
         buildMetadata: sha1 ?? ''
     }
