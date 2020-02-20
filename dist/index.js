@@ -1672,8 +1672,8 @@ function getVersionFromGit(git, logger = lib_1.nullLogger) {
         const [major, minor] = majorMinor.substring(1).split(dotRegex);
         return {
             major,
-            minor,
-            patch: (commitsSinceTag !== null && commitsSinceTag !== void 0 ? commitsSinceTag : ''),
+            minor: (minor !== null && minor !== void 0 ? minor : '0'),
+            patch: (commitsSinceTag !== null && commitsSinceTag !== void 0 ? commitsSinceTag : '0'),
             preRelease: '',
             buildMetadata: (sha1 !== null && sha1 !== void 0 ? sha1 : '')
         };
@@ -1688,9 +1688,9 @@ function withPullRequestInfo(version, event) {
 exports.withPullRequestInfo = withPullRequestInfo;
 function stringify(v, includeMetadata) {
     let res = `${v.major}.${v.minor}.${v.patch}`;
-    if (v.preRelease != null)
+    if (v.preRelease)
         res += `-${v.preRelease}`;
-    if (includeMetadata && v.buildMetadata != null)
+    if (includeMetadata && v.buildMetadata)
         res += `+${v.buildMetadata}`;
     return res;
 }
