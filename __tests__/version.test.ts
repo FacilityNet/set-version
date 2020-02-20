@@ -30,7 +30,7 @@ describe('getVersionFromGit', () => {
         await expect(getVersionFromGit(git)).resolves.toEqual({
             major: '2',
             minor: '5',
-            patch: '',
+            patch: '0',
             preRelease: '',
             buildMetadata: ''
         })
@@ -46,6 +46,21 @@ describe('getVersionFromGit', () => {
             major: '2',
             minor: '0',
             patch: '13',
+            preRelease: '',
+            buildMetadata: 'gdb82e9be'
+        })
+    })
+
+    test('handles tag without minor version', async () => {
+        const git: Git = {
+            fetchTags: logger => Promise.resolve(''),
+            describe: (glob, logger) => Promise.resolve('v51-26-gdb82e9be')
+        }
+
+        await expect(getVersionFromGit(git)).resolves.toEqual({
+            major: '51',
+            minor: '0',
+            patch: '26',
             preRelease: '',
             buildMetadata: 'gdb82e9be'
         })
@@ -104,6 +119,16 @@ describe('stringify', () => {
 
         expect(stringify(version, false)).toEqual('2.1.5')
     })
+    test('does not append metadata for empty string', () => {
+        const version: SemanticVersion = {
+            major: '2',
+            minor: '1',
+            patch: '5',
+            buildMetadata: ''
+        }
+
+        expect(stringify(version, true)).toEqual('2.1.5')
+    })
     test('appends metadata correctly', () => {
         const version: SemanticVersion = {
             major: '2',
@@ -113,6 +138,16 @@ describe('stringify', () => {
         }
 
         expect(stringify(version, true)).toEqual('2.1.5+sjkdhksdjka')
+    })
+    test('does not append pre-release for empty string', () => {
+        const version: SemanticVersion = {
+            major: '2',
+            minor: '1',
+            patch: '5',
+            preRelease: ''
+        }
+
+        expect(stringify(version, true)).toEqual('2.1.5')
     })
     test('appends prerelease correctly', () => {
         const version: SemanticVersion = {
