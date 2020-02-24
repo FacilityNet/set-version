@@ -24,7 +24,9 @@ export async function getVersionFromGit(
     const described = await git.describe('v*', logger)
 
     // Parse tag output
-    const [majorMinor, commitsSinceTag, sha1] = described.split(dashRegex)
+    const [majorMinor, commitsSinceTag, sha1] = described
+        .trim()
+        .split(dashRegex)
     const [major, minor] = majorMinor.substring(1).split(dotRegex)
 
     return {
