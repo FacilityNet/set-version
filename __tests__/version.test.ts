@@ -65,6 +65,36 @@ describe('getVersionFromGit', () => {
             buildMetadata: 'gdb82e9be'
         })
     })
+
+    test('handles tag with major version 0', async () => {
+        const git: Git = {
+            fetchTags: logger => Promise.resolve(''),
+            describe: (glob, logger) => Promise.resolve('v0.1')
+        }
+
+        await expect(getVersionFromGit(git)).resolves.toEqual({
+            major: '0',
+            minor: '1',
+            patch: '0',
+            preRelease: '',
+            buildMetadata: ''
+        })
+    })
+
+    test('handles whitespace in git output', async () => {
+        const git: Git = {
+            fetchTags: logger => Promise.resolve(''),
+            describe: (glob, logger) => Promise.resolve('v0.1\n')
+        }
+
+        await expect(getVersionFromGit(git)).resolves.toEqual({
+            major: '0',
+            minor: '1',
+            patch: '0',
+            preRelease: '',
+            buildMetadata: ''
+        })
+    })
 })
 
 describe('withPullRequestInfo', () => {
@@ -169,5 +199,16 @@ describe('stringify', () => {
         }
 
         expect(stringify(version, true)).toEqual('2.1.5-pr2348+abbcaf')
+    })
+    test('handles v0.1.0 correctly', () => {
+        const version: SemanticVersion = {
+            major: '0',
+            minor: '1',
+            patch: '0',
+            preRelease: '',
+            buildMetadata: ''
+        }
+
+        expect(stringify(version, false)).toEqual('0.1.0')
     })
 })
