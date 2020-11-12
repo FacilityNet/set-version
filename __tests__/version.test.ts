@@ -116,7 +116,7 @@ describe('withPullRequestInfo', () => {
         }
 
         const event: PullRequestEvent = {
-            action: PullRequestAction.OPENED,
+            action: PullRequestAction.Opened,
             number: 51
         }
         expect(withPullRequestInfo(version, event)).toEqual({

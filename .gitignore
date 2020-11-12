@@ -96,6 +96,7 @@ Thumbs.db
 
 # Ignore built ts files
 __tests__/runner/*
+out/
 lib/**/*
 
 # Commit dist folder on release branches

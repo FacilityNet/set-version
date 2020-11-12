@@ -1,18 +1,20 @@
+/* eslint-disable @typescript-eslint/naming-convention -- These interfaces are controlled by GitHub, we cannot enforce naming conventions */
+
 export enum PullRequestAction {
-    ASSIGNED = 'assigned',
-    UNASSIGNED = 'unassigned',
-    LABELED = 'labeled',
-    UNLABELED = 'unlabeled',
-    OPENED = 'opened',
-    EDITED = 'edited',
-    CLOSED = 'closed',
-    REOPENED = 'reopened',
-    SYNCHRONIZE = 'synchronize',
-    READY_FOR_REVIEW = 'ready_for_review',
-    LOCKED = 'locked',
-    UNLOCKED = 'unlocked',
-    REVIEW_REQUESTED = 'review_requested',
-    REVIEW_REQUEST_REMOVED = 'review_request_removed'
+    Assigned = 'assigned',
+    Unassigned = 'unassigned',
+    Labeled = 'labeled',
+    Unlabeled = 'unlabeled',
+    Opened = 'opened',
+    Edited = 'edited',
+    Closed = 'closed',
+    Reopened = 'reopened',
+    Synchronize = 'synchronize',
+    ReadyForReview = 'ready_for_review',
+    Locked = 'locked',
+    Unlocked = 'unlocked',
+    ReviewRequested = 'review_requested',
+    ReviewRequestRemoved = 'review_request_removed'
 }
 
 export interface User {
