@@ -96,6 +96,7 @@ Thumbs.db
 
 # Ignore built ts files
 __tests__/runner/*
+out/
 lib/**/*
 
 # Ignore dist folder when on master branch
