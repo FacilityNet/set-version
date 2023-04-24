@@ -1,4 +1,4 @@
-name: 'Your name here'
+name: 'set-version'
 description: 'Sets version info for a project by using git tags'
 author: 'FacilityNet'
 outputs:
@@ -17,5 +17,5 @@ outputs:
   buildMetadata:
     description: 'The build metadata component, if any'
 runs:
-  using: 'node12'
+  using: 'node18'
   main: 'dist/index.js'
